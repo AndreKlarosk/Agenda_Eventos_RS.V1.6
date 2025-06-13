@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        let title = eventTitleInput.value.trim(); // General title, now optional
+        
         const description = eventDescInput.value.trim();
         const eventId = eventIdInput.value || `${selectedDate}-${Date.now()}`;
         const hour = eventHourInput.value;
