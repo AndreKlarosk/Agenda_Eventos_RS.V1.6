@@ -453,7 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 let city = event.city || ''; // Get city for the dedicated column
 
                 if (event.eventType === 'Reunião' && event.reuniaoTypes && event.reuniaoTypes.length > 0) {
-                    eventDetails = `Tipos: ${event.reuniaoTypes.join(', ')}`;
+                    eventDetails = ` ${event.reuniaoTypes.join(', ')}`;
                 } else if (event.eventType === 'Batismo' || event.eventType === 'Reunião para Mocidade') {
                     eventDetails = `Ancião: ${event.ancientsName || 'N/A'}`;
                 } else if (event.eventType === 'Ensaio Regional') {
