@@ -138,8 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
             ensaioRegionalOptionsDiv.style.display = 'block';
         } else if (eventType === 'Ensaio Local') {
             ensaioLocalOptionsDiv.style.display = 'block';
-        } else if (eventType === '') { // No event type selected or default
-             eventTitleInput.style.display = 'block'; // Show general title input
         }
     }
 
