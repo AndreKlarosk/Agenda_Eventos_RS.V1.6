@@ -242,23 +242,6 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // FUNÇÃO PARA ADICIONAR LOGO AO PDF
-    function addLogoToPDF(doc, x, y, width, height) {
-        // Certifique-se de que a imagem 'logo-ccb.png' está no mesmo diretório ou forneça o caminho correto.
-        const img = new Image();
-        img.src = 'logo-ccb.png'; // Caminho para sua imagem
-        img.onload = () => {
-            doc.addImage(img, 'PNG', x, y, width, height);
-            doc.save(`Relatorio_${currentDate.toLocaleString('pt-BR', { month: 'long' })}_${currentDate.getFullYear()}.pdf`);
-        };
-        img.onerror = () => {
-            console.error("Erro ao carregar a imagem da logo.");
-            // Se a imagem não carregar, salve o PDF sem a logo
-            doc.save(`Relatorio_${currentDate.toLocaleString('pt-BR', { month: 'long' })}_${currentDate.getFullYear()}.pdf`);
-        };
-    }
-
-
     // FUNÇÃO DE EXPORTAÇÃO PARA PDF
     function exportToPDF() {
         const { jsPDF } = window.jspdf;
@@ -266,55 +249,129 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const monthName = currentDate.toLocaleString('pt-BR', { month: 'long' });
         const year = currentDate.getFullYear();
-        doc.text(`Relatório de Eventos - ${monthName}/${year}`, 10, 10);
+        const titleText = `Relatório de Eventos - ${monthName}/${year}`;
 
-        const transaction = db.transaction(['events'], 'readonly');
-        const objectStore = transaction.objectStore('events');
-        const request = objectStore.getAll();
+        // Add logo to top-left corner
+        const img = new Image();
+        img.src = 'logo-ccb.png'; // Path to your image
 
-        request.onsuccess = (event) => {
-            let allEvents = event.target.result;
+        img.onload = () => {
+            // Add image. Adjust x, y, width, height as needed.
+            // (x, y, width, height) - coordinates in mm.
+            doc.addImage(img, 'PNG', 10, 10, 30, 15); // Example: 10mm from left, 10mm from top, 30mm width, 15mm height
 
-            // Filtrar eventos para o mês e ano atuais
-            const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).toISOString().split('T')[0];
-            const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).toISOString().split('T')[0];
+            // Calculate x-coordinate for centered title
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const textX = pageWidth / 2;
+            const textY = 20; // Y-coordinate for the title, below the logo if needed
 
-            const eventsInMonth = allEvents.filter(event =>
-                event.date >= startOfMonth && event.date <= endOfMonth
-            );
+            // Add title centered
+            doc.text(titleText, textX, textY, { align: 'center' });
 
-            // Ordenar eventos por data e depois por hora
-            eventsInMonth.sort((a, b) => {
-                if (a.date === b.date) {
-                    return a.hour.localeCompare(b.hour);
-                }
-                return a.date.localeCompare(b.date);
-            });
 
-            const tableBody = eventsInMonth.map(event => {
-                // Formatar a data para exibição
-                const [y, m, d] = event.date.split('-');
-                const formattedDate = `${d}/${m}/${y}`; // Formato dd/mm/yyyy para o Brasil
+            const transaction = db.transaction(['events'], 'readonly');
+            const objectStore = transaction.objectStore('events');
+            const request = objectStore.getAll();
 
-                const participants = event.participants && event.participants.length > 0 ? event.participants.join(', ') : "Nenhum";
-                return [
-                    formattedDate,
-                    event.hour || "—",
-                    event.title,
-                    event.description || "Sem descrição",
-                    event.city || "Não informada", // Adicionar a cidade
-                    participants
-                ];
-            });
+            request.onsuccess = (event) => {
+                let allEvents = event.target.result;
 
-            doc.autoTable({
-                head: [["Data", "Horário", "Título", "Descrição", "Cidade", "Participantes"]], // Adicionar "Cidade" no cabeçalho
-                body: tableBody,
-                startY: 30
-            });
+                // Filtrar eventos para o mês e ano atuais
+                const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).toISOString().split('T')[0];
+                const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).toISOString().split('T')[0];
 
-            // Adicionar logo após a tabela ser gerada
-            addLogoToPDF(doc, 10, doc.internal.pageSize.height - 30, 40, 20); // Ajuste a posição e tamanho conforme necessário
+                const eventsInMonth = allEvents.filter(event =>
+                    event.date >= startOfMonth && event.date <= endOfMonth
+                );
+
+                // Ordenar eventos por data e depois por hora
+                eventsInMonth.sort((a, b) => {
+                    if (a.date === b.date) {
+                        return a.hour.localeCompare(b.hour);
+                    }
+                    return a.date.localeCompare(b.date);
+                });
+
+                const tableBody = eventsInMonth.map(event => {
+                    // Formatar a data para exibição
+                    const [y, m, d] = event.date.split('-');
+                    const formattedDate = `${d}/${m}/${y}`; // Formato dd/mm/yyyy para o Brasil
+
+                    const participants = event.participants && event.participants.length > 0 ? event.participants.join(', ') : "Nenhum";
+                    return [
+                        formattedDate,
+                        event.hour || "—",
+                        event.title,
+                        event.description || "Sem descrição",
+                        event.city || "Não informada", // Adicionar a cidade
+                        participants
+                    ];
+                });
+
+                doc.autoTable({
+                    head: [["Data", "Horário", "Título", "Descrição", "Cidade", "Participantes"]], // Adicionar "Cidade" no cabeçalho
+                    body: tableBody,
+                    startY: textY + 10 // Start table below the title and logo
+                });
+
+                doc.save(`Relatorio_${monthName}_${year}.pdf`);
+            };
+        };
+
+        img.onerror = () => {
+            console.error("Erro ao carregar a imagem da logo.");
+            // If the image fails to load, save the PDF without the logo
+            // Calculate x-coordinate for centered title
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const textX = pageWidth / 2;
+            const textY = 20;
+
+            doc.text(titleText, textX, textY, { align: 'center' });
+
+            const transaction = db.transaction(['events'], 'readonly');
+            const objectStore = transaction.objectStore('events');
+            const request = objectStore.getAll();
+
+            request.onsuccess = (event) => {
+                let allEvents = event.target.result;
+
+                const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).toISOString().split('T')[0];
+                const endOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).toISOString().split('T')[0];
+
+                const eventsInMonth = allEvents.filter(event =>
+                    event.date >= startOfMonth && event.date <= endOfMonth
+                );
+
+                eventsInMonth.sort((a, b) => {
+                    if (a.date === b.date) {
+                        return a.hour.localeCompare(b.hour);
+                    }
+                    return a.date.localeCompare(b.date);
+                });
+
+                const tableBody = eventsInMonth.map(event => {
+                    const [y, m, d] = event.date.split('-');
+                    const formattedDate = `${d}/${m}/${y}`;
+
+                    const participants = event.participants && event.participants.length > 0 ? event.participants.join(', ') : "Nenhum";
+                    return [
+                        formattedDate,
+                        event.hour || "—",
+                        event.title,
+                        event.description || "Sem descrição",
+                        event.city || "Não informada",
+                        participants
+                    ];
+                });
+
+                doc.autoTable({
+                    head: [["Data", "Horário", "Título", "Descrição", "Cidade", "Participantes"]],
+                    body: tableBody,
+                    startY: textY + 10
+                });
+
+                doc.save(`Relatorio_${monthName}_${year}.pdf`);
+            };
         };
     }
 
