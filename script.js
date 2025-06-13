@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.addEventListener('click', () => {
                     eventIdInput.value = event.id;
                     eventTypeSelect.value = event.eventType || ''; // Set event type dropdown
-                    eventTitleInput.value = event.title || ''; // General title
+                    // REMOVED: eventTitleInput.value = event.title || ''; // General title
 
                     showConditionalInputs(event.eventType); // Show/hide inputs based on type
 
@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetModal() {
         modalTitle.textContent = 'Adicionar Evento';
         eventIdInput.value = '';
-        eventTitleInput.value = '';
+        // REMOVED: eventTitleInput.value = '';
         eventDescInput.value = '';
         eventHourInput.value = '';
         eventTypeSelect.value = ''; // Reset event type dropdown
@@ -285,6 +285,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .map(checkbox => reuniaoTypes.push(checkbox.value));
             // No need to set title here, it will be generated in PDF export using full names
             city = cityInputReuniao.value.trim();
+            title = ''; // Ensure title is empty for 'Reunião' to allow dynamic generation
         } else if (eventType === 'Batismo' || eventType === 'Reunião para Mocidade') {
             ancientsName = ancientsNameInput.value.trim();
             city = cityInputBM.value.trim();
