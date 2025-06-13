@@ -385,36 +385,39 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Updated exportToPDF to export by period
-    async function exportToPDF() {
+   // FUNÇÃO DE EXPORTAÇÃO PARA PDF
+    function exportToPDF() {
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('landscape'); // Set orientation to landscape
+        const doc = new jsPDF();
 
-        const start = startDateInput.value;
-        const end = endDateInput.value;
+        const monthName = currentDate.toLocaleString('pt-BR', { month: 'long' });
+        const year = currentDate.getFullYear();
+        const titleText = `Relatório de Eventos - ${monthName}/${year}`;
 
-        if (!start || !end) {
-            alert('Por favor, selecione as datas de início e fim para o relatório.');
-            return;
-        }
+        // Add logo to top-left corner
+        const img = new Image();
+        img.src = 'logo-ccb.png'; // Path to your image
 
-        const startDate = new Date(start + 'T00:00:00'); // Ensure date comparison is accurate
-        const endDate = new Date(end + 'T23:59:59');   // Ensure end of day for comparison
+        img.onload = () => {
+            // Add image. Adjust x, y, width, height as needed.
+            // (x, y, width, height) - coordinates in mm.
+            doc.addImage(img, 'PNG', 10, 10, 30, 15); // Example: 10mm from left, 10mm from top, 30mm width, 15mm height
 
-        if (startDate > endDate) {
-            alert('A data de início não pode ser posterior à data de fim.');
-            return;
-        }
+            // Calculate x-coordinate for centered title
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const textX = pageWidth / 2;
+            const textY = 20; // Y-coordinate for the title, below the logo if needed
 
-        doc.setFontSize(16); // Slightly smaller font for more space
-        doc.text(`Relatório de Eventos - Período: ${start} a ${end}`, 14, 22);
+            // Add title centered
+            doc.text(titleText, textX, textY, { align: 'center' });
 
-        const events = await getEventsForPeriod(startDate, endDate); // Use the new function
 
-        if (events.length === 0) {
-            doc.setFontSize(12);
-            doc.text(`Nenhum evento agendado para o período de ${start} a ${end}.`, 14, 35);
-        } else {
+            const transaction = db.transaction(['events'], 'readonly');
+            const objectStore = transaction.objectStore('events');
+            const request = objectStore.getAll();
+
+            request.onsuccess = (event) => {
+                let allEvents = event.target.result;
             // Ordena os eventos pela data e depois pela hora
             events.sort((a, b) => {
                 const dateA = a.id.split('-').slice(0, 3).join('-');
