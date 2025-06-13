@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 item.addEventListener('click', () => {
                     eventIdInput.value = event.id;
-                    eventTypeSelect.value = event.eventType || ''; // Set event type dropdown
+                    
                     eventTitleInput.value = event.title || ''; // General title
 
                     showConditionalInputs(event.eventType); // Show/hide inputs based on type
