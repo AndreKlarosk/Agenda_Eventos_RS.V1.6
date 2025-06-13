@@ -305,7 +305,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const eventData = {
             id: eventId,
             eventType: eventType, // Store event type
-            title: title, // Updated title based on type (can be empty for Reunião to be dynamically generated)
             description: description,
             hour: hour,
             participants: selectedParticipants,
