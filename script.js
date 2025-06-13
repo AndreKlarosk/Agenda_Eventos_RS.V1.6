@@ -174,8 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 item.addEventListener('click', () => {
                     eventIdInput.value = event.id;
-                    
-                    eventTitleInput.value = event.title || ''; // General title
 
                     showConditionalInputs(event.eventType); // Show/hide inputs based on type
 
