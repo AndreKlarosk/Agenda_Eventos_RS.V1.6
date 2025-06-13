@@ -121,53 +121,24 @@ body {
 }
 
 /* Modificações para o botão Exportar PDF */
-#export-controls {
-    display: flex;
-    flex-wrap: wrap; /* Allows items to wrap on smaller screens */
-    gap: 10px; /* Space between elements */
-    margin-top: 20px;
-    justify-content: center; /* Center the controls */
-    align-items: flex-end; /* Align items to the bottom if they have different heights */
-}
-
-.date-input-group {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 5px; /* Adjust spacing */
-}
-
-.date-input-group label {
-    font-size: 0.9em;
-    margin-bottom: 3px;
-    color: var(--dark-text);
-}
-
-#start-date-input,
-#end-date-input {
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 0.9em;
-    width: 150px; /* Adjust width as needed */
-    box-sizing: border-box; /* Include padding and border in the element's total width and height */
-}
-
 #export-pdf-btn {
+    display: block; /* Garante que ocupe a largura total para margin auto funcionar */
+    width: 30%; /* Mantém a largura de 30% como você tinha */
+    max-width: 250px; /* Adiciona um max-width para não ficar muito grande em telas largas */
     padding: 12px;
-    background: linear-gradient(45deg, #27ae60, #2ecc71);
+    margin: 10px auto 0 auto; /* Centraliza horizontalmente: top 10px, auto para laterais, bottom 0, auto para laterais */
+    background: linear-gradient(45deg, #27ae60, #2ecc71); /* Degradê: do verde escuro para um verde mais claro */
     color: var(--light-text);
     border: none;
-    border-radius: 5px;
+    border-radius: 5px; /* Ajuste o border-radius para um valor fixo, 'center' não é válido */
     cursor: pointer;
     font-size: 1em;
-    transition: background 0.3s ease, box-shadow 0.3s ease;
-    flex-grow: 1; /* Allows the button to grow and fill space */
-    max-width: 200px; /* Limit button width */
+    transition: background 0.3s ease, box-shadow 0.3s ease; /* Transição para o hover */
 }
 
 #export-pdf-btn:hover {
-    background: linear-gradient(45deg, #229a53, #27ae60);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background: linear-gradient(45deg, #229a53, #27ae60); /* Degradê mais escuro no hover */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adiciona uma pequena sombra no hover */
 }
 
 
@@ -192,15 +163,15 @@ body {
     width: 90%;
     max-width: 500px;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-     max-height: 90vh;
-    overflow-y: auto;
+     max-height: 90vh; /* Limita a altura máxima do modal a 90% da altura da viewport */
+    overflow-y: auto; /* Adiciona rolagem vertical se o conteúdo exceder max-height */
 }
 #event-list {
     list-style: none;
     padding: 0;
-    max-height: 200px;
-    overflow-y: auto;
-    border-top: 1px solid #eee;
+    max-height: 200px; /* Limita a altura da lista de eventos para que ela role */
+    overflow-y: auto; /* Adiciona rolagem vertical para a lista de eventos */
+    border-top: 1px solid #eee; /* Linha divisória */
     margin-top: 20px;
     padding-top: 10px;
 }
@@ -219,7 +190,7 @@ body {
 }
 
 #event-title-input,
-#event-hour-input,
+#event-hour-input, /* Adicionado para estilizar o campo de hora */
 #event-desc-input {
     width: 100%;
     padding: 10px;
@@ -234,6 +205,113 @@ body {
     resize: vertical;
 }
 
+/* Estilo para o grupo de checkboxes de participantes */
+.participant-group {
+    margin-bottom: 15px;
+    border: 1px solid #eee;
+    padding: 10px;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.participant-group label {
+    margin-bottom: 5px;
+    display: inline-block; /* Para que os labels fiquem ao lado dos checkboxes */
+    font-weight: normal;
+    font-size: 0.95em;
+    margin-left: 5px; /* Espaço entre o checkbox e o texto */
+}
+
+.participant-group input[type="checkbox"] {
+    margin-right: 5px;
+    vertical-align: middle; /* Alinha o checkbox com o texto */
+}
+
+
+#save-event-btn, #delete-event-btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    transition: opacity 0.3s;
+    margin-right: 10px; /* Adiciona espaço entre os botões */
+}
+
+#save-event-btn {
+    background-color: var(--secondary-color);
+}
+
+#delete-event-btn {
+    background-color: var(--danger-color);
+    display: none; /* Oculto por padrão */
+}
+
+#save-event-btn:hover, #delete-event-btn:hover {
+    opacity: 0.8;
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+    #calendar-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    #calendar-header h2 {
+        font-size: 1.4em;
+        text-align: center;
+    }
+
+    #calendar-header button {
+        width: 100%;
+    }
+
+    #weekdays-container {
+        font-size: 0.8em;
+    }
+
+    .day {
+        padding: 10px;
+        min-height: 60px;
+    }
+
+    #export-pdf-btn {
+        width: 80%; /* Aumenta a largura do botão em telas pequenas */
+        font-size: 0.9em;
+        padding: 10px;
+    }
+
+    .modal-content {
+        padding: 20px;
+    }
+}
+
+/* Estilos para a lista de eventos no modal */
+#event-list {
+    list-style: none;
+    padding: 0;
+    max-height: 200px; /* Limita a altura e adiciona scroll */
+    overflow-y: auto;
+    border-top: 1px solid #eee; /* Linha divisória */
+    margin-top: 20px;
+    padding-top: 10px;
+}
+
+#event-list li {
+    padding: 8px 0;
+    border-bottom: 1px dashed #f0f0f0; /* Linha tracejada para separar itens */
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+#event-list li:last-child {
+    border-bottom: none; /* Remove a borda do último item */
+}
+
+#event-list li:hover {
+    background-color: #e9e9e9;
+}
 /* Style for the select dropdown */
 #event-type-select {
     width: 100%;
@@ -281,117 +359,56 @@ body {
     margin-right: 5px;
     vertical-align: middle;
 }
+/* Add to style (4).css */
 
-/* Estilo para o grupo de checkboxes de participantes */
-.participant-group {
-    margin-bottom: 15px;
-    border: 1px solid #eee;
-    padding: 10px;
+#export-controls {
+    display: flex;
+    flex-wrap: wrap; /* Allows items to wrap on smaller screens */
+    gap: 10px; /* Space between elements */
+    margin-top: 20px;
+    justify-content: center; /* Center the controls */
+    align-items: flex-end; /* Align items to the bottom if they have different heights */
+}
+
+.date-input-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 5px; /* Adjust spacing */
+}
+
+.date-input-group label {
+    font-size: 0.9em;
+    margin-bottom: 3px;
+    color: var(--dark-text);
+}
+
+#start-date-input,
+#end-date-input {
+    padding: 8px;
+    border: 1px solid #ccc;
     border-radius: 4px;
-    background-color: #f9f9f9;
+    font-size: 0.9em;
+    width: 150px; /* Adjust width as needed */
+    box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 
-.participant-group label {
-    margin-bottom: 5px;
-    display: inline-block;
-    font-weight: normal;
-    font-size: 0.95em;
-    margin-left: 5px;
+#export-pdf-btn {
+    /* Existing styles for the button, just ensure it fits well here */
+    flex-grow: 1; /* Allows the button to grow and fill space */
+    max-width: 200px; /* Limit button width */
 }
 
-.participant-group input[type="checkbox"] {
-    margin-right: 5px;
-    vertical-align: middle;
-}
-
-
-#save-event-btn, #delete-event-btn {
-    padding: 12px 20px;
-    border: none;
-    border-radius: 5px;
-    color: white;
-    cursor: pointer;
-    transition: opacity 0.3s;
-    margin-right: 10px;
-}
-
-#save-event-btn {
-    background-color: var(--secondary-color);
-}
-
-#delete-event-btn {
-    background-color: var(--danger-color);
-    display: none;
-}
-
-#save-event-btn:hover, #delete-event-btn:hover {
-    opacity: 0.8;
-}
-
-/* Responsividade */
+/* Adjustments for smaller screens */
 @media (max-width: 600px) {
-    #calendar-header {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    #calendar-header h2 {
-        font-size: 1.4em;
-        text-align: center;
-    }
-
-    #calendar-header button {
-        width: 100%;
-    }
-
-    #weekdays-container {
-        font-size: 0.8em;
-    }
-
-    .day {
-        padding: 10px;
-        min-height: 60px;
-    }
-
     #export-controls {
         flex-direction: column;
-        align-items: stretch;
+        align-items: stretch; /* Stretch items to full width */
     }
 
     #start-date-input,
     #end-date-input,
     #export-pdf-btn {
-        width: 100%;
-        max-width: none;
+        width: 100%; /* Full width on small screens */
+        max-width: none; /* Remove max-width constraint */
     }
-
-    .modal-content {
-        padding: 20px;
-    }
-}
-
-/* Estilos para a lista de eventos no modal */
-#event-list {
-    list-style: none;
-    padding: 0;
-    max-height: 200px;
-    overflow-y: auto;
-    border-top: 1px solid #eee;
-    margin-top: 20px;
-    padding-top: 10px;
-}
-
-#event-list li {
-    padding: 8px 0;
-    border-bottom: 1px dashed #f0f0f0;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-}
-
-#event-list li:last-child {
-    border-bottom: none;
-}
-
-#event-list li:hover {
-    background-color: #e9e9e9;
 }
