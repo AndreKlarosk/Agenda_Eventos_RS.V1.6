@@ -230,7 +230,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetModal() {
         modalTitle.textContent = 'Adicionar Evento';
         eventIdInput.value = '';
-        eventTitleInput.value = '';
         eventDescInput.value = '';
         eventHourInput.value = '';
         eventTypeSelect.value = ''; // Reset event type dropdown
@@ -308,6 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const eventData = {
             id: eventId,
             eventType: eventType, // Store event type
+            title: title, // Updated title based on type (can be empty for Reunião to be dynamically generated)
             description: description,
             hour: hour,
             participants: selectedParticipants,
