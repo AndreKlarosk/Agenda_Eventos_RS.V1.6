@@ -308,7 +308,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const eventData = {
             id: eventId,
             eventType: eventType, // Store event type
-            title: title, // Updated title based on type (can be empty for Reunião to be dynamically generated)
             description: description,
             hour: hour,
             participants: selectedParticipants,
@@ -471,7 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     eventTypeDisplay = reuniaoFullNames[event.reuniaoTypes[0]] || event.reuniaoTypes[0];
                     // Join all reunion types with their full names for "Detalhes"
                     const fullNames = event.reuniaoTypes.map(type => reuniaoFullNames[type] || type);
-                    eventDetails = `Tipos: ${fullNames.join(', ')}`;
+                    eventDetails = ` ${fullNames.join(', ')}`;
                 } else if (event.eventType === 'Batismo' || event.eventType === 'Reunião para Mocidade') {
                     eventDetails = `Ancião: ${event.ancientsName || 'N/A'}`;
                 } else if (event.eventType === 'Ensaio Regional') {
