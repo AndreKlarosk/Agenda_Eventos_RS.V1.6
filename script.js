@@ -429,7 +429,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const hourA = a.hour || '00:00';
                 const hourB = b.hour || '00:00';
                 return hourA.localeCompare(hourB);
-            });
+            }
 
             const tableColumnTitles = ["Data", "Horário", "Tipo de Evento", "Cidade", "Detalhes", "Descrição", "Participantes"];
             const tableBody = events.map(event => {
