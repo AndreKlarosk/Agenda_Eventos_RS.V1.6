@@ -426,7 +426,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Centralize title
         doc.setFontSize(16);
-        const titleText = `CONGREGAÇÃO CRISTA NO BRASIL \n Relatório- Período: ${start} a ${end}`;
+        const titleLine1 = `CONGREGAÇÃO CRISTA NO BRASIL`;
+        const titleLine2 = `Relatório - Período: ${start} a ${end}`;
         const textWidth = doc.getStringUnitWidth(titleText) * doc.internal.getFontSize() / doc.internal.scaleFactor;
         const xOffset = (doc.internal.pageSize.width - textWidth) / 2;
         doc.text(titleText, xOffset, 22);
