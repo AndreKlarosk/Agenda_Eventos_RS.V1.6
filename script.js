@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
         batismoMocidadeOptionsDiv.style.display = 'none';
         ensaioRegionalOptionsDiv.style.display = 'none';
         ensaioLocalOptionsDiv.style.display = 'none';
-       
+        eventTitleInput.style.display = 'none'; // Hide general title by default
 
         // Show specific divs based on event type
         if (eventType === 'Reunião') {
@@ -138,6 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
             ensaioRegionalOptionsDiv.style.display = 'block';
         } else if (eventType === 'Ensaio Local') {
             ensaioLocalOptionsDiv.style.display = 'block';
+        } else if (eventType === '') { // No event type selected or default
+             eventTitleInput.style.display = 'block'; // Show general title input
         }
     }
 
@@ -174,6 +176,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 item.addEventListener('click', () => {
                     eventIdInput.value = event.id;
+                    eventTypeSelect.value = event.eventType || ''; // Set event type dropdown
+                    eventTitleInput.value = event.title || ''; // General title
 
                     showConditionalInputs(event.eventType); // Show/hide inputs based on type
 
@@ -226,6 +230,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetModal() {
         modalTitle.textContent = 'Adicionar Evento';
         eventIdInput.value = '';
+        eventTitleInput.value = '';
         eventDescInput.value = '';
         eventHourInput.value = '';
         eventTypeSelect.value = ''; // Reset event type dropdown
@@ -262,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        
+        let title = eventTitleInput.value.trim(); // General title, now optional
         const description = eventDescInput.value.trim();
         const eventId = eventIdInput.value || `${selectedDate}-${Date.now()}`;
         const hour = eventHourInput.value;
@@ -303,6 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const eventData = {
             id: eventId,
             eventType: eventType, // Store event type
+            title: title, // Updated title based on type (can be empty for Reunião to be dynamically generated)
             description: description,
             hour: hour,
             participants: selectedParticipants,
@@ -424,19 +430,25 @@ document.addEventListener('DOMContentLoaded', () => {
         await new Promise(resolve => img.onload = resolve);
         doc.addImage(img, 'PNG', 14, 10, 30, 15); // x, y, width, height
 
-        // Centralize title
+        // Centralize title (updated for two lines)
         doc.setFontSize(16);
         const titleLine1 = `CONGREGAÇÃO CRISTA NO BRASIL`;
         const titleLine2 = `Relatório - Período: ${start} a ${end}`;
-        const textWidth = doc.getStringUnitWidth(titleText) * doc.internal.getFontSize() / doc.internal.scaleFactor;
-        const xOffset = (doc.internal.pageSize.width - textWidth) / 2;
-        doc.text(titleText, xOffset, 22);
+
+        const textWidth1 = doc.getStringUnitWidth(titleLine1) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+        const textWidth2 = doc.getStringUnitWidth(titleLine2) * doc.internal.getFontSize() / doc.internal.scaleFactor;
+
+        const xOffset1 = (doc.internal.pageSize.width - textWidth1) / 2;
+        const xOffset2 = (doc.internal.pageSize.width - textWidth2) / 2;
+
+        doc.text(titleLine1, xOffset1, 22);
+        doc.text(titleLine2, xOffset2, 29); // Adjust Y position for the second line
 
         const events = await getEventsForPeriod(startDate, endDate); // Use the new function
 
         if (events.length === 0) {
             doc.setFontSize(12);
-            doc.text(`Nenhum evento agendado para o período de ${start} a ${end}.`, 14, 35);
+            doc.text(`Nenhum evento agendado para o período de ${start} a ${end}.`, 14, 40); // Adjusted Y position
         } else {
             // Ordena os eventos pela data e depois pela hora
             events.sort((a, b) => {
@@ -466,7 +478,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     eventTypeDisplay = reuniaoFullNames[event.reuniaoTypes[0]] || event.reuniaoTypes[0];
                     // Join all reunion types with their full names for "Detalhes"
                     const fullNames = event.reuniaoTypes.map(type => reuniaoFullNames[type] || type);
-                    eventDetails = ` ${fullNames.join(', ')}`;
+                    eventDetails = `Tipos: ${fullNames.join(', ')}`;
                 } else if (event.eventType === 'Batismo' || event.eventType === 'Reunião para Mocidade') {
                     eventDetails = `Ancião: ${event.ancientsName || 'N/A'}`;
                 } else if (event.eventType === 'Ensaio Regional') {
@@ -495,7 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
             doc.autoTable({
                 head: [tableColumnTitles],
                 body: tableBody,
-                startY: 30,
+                startY: 40, // Adjusted startY to accommodate the two-line title
                 // Adjust column styles for better fit in landscape
                 columnStyles: {
                     // Adjust column widths as needed for landscape
