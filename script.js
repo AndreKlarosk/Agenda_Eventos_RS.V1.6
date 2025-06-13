@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
         batismoMocidadeOptionsDiv.style.display = 'none';
         ensaioRegionalOptionsDiv.style.display = 'none';
         ensaioLocalOptionsDiv.style.display = 'none';
-        eventTitleInput.style.display = 'none'; // Hide general title by default
+       
 
         // Show specific divs based on event type
         if (eventType === 'Reunião') {
