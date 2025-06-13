@@ -35,11 +35,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const cityInputER = document.getElementById('city-input-er');
     const localManagerInput = document.getElementById('local-manager-input');
     const cityInputEL = document.getElementById('city-input-el');
-    const cityInputReuniao = document.getElementById('city-input-reuniao'); // NEW: City input for Reuniao
+    const cityInputReuniao = document.getElementById('city-input-reuniao');
 
     // NEW CHECKBOXES
     const participantCheckboxes = document.querySelectorAll('input[name="event-participant"]');
     const reuniaoTypeCheckboxes = document.querySelectorAll('input[name="reuniao-type"]'); // For RMA, RRM, etc.
+
+    // Mapping for full event names
+    const reuniaoFullNames = {
+        'RMA': 'RMA - Reunião Ministerial de Anciães',
+        'RRM': 'RRM - Reunião Regional Ministerial',
+        'RRA': 'RRA - Reunião Regional de Anciães',
+        'RCJM': 'RCJM - Reunião de Conselhos e Jovens e Menores',
+        'RCAD': 'RCAD - Reunião de Conselhos e Administração',
+        'RSM': 'RSM - Reunião de Sincronismo Ministerial',
+        'REP': 'REP - Reunião de Encarregados de Orquestra e Pessoas',
+        'RAP': 'RAP - Reunião de Administradores e Porteiros'
+    };
 
     // ESTADO DO CALENDÁRIO
     let currentDate = new Date();
@@ -152,7 +164,8 @@ document.addEventListener('DOMContentLoaded', () => {
             events.forEach(event => {
                 let eventDisplayTitle = event.title || event.eventType; // Use type if no specific title
                 if (event.eventType === 'Reunião' && event.reuniaoTypes && event.reuniaoTypes.length > 0) {
-                    eventDisplayTitle += ` (${event.reuniaoTypes.join(', ')})`;
+                    const fullNames = event.reuniaoTypes.map(type => reuniaoFullNames[type] || type);
+                    eventDisplayTitle = `Reunião (${fullNames.join(', ')})`;
                 }
                 const item = document.createElement('li');
                 item.textContent = `${event.hour || '—'} - ${eventDisplayTitle}`;
@@ -172,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     eventHourInput.value = event.hour || '';
 
                     // Populate specific inputs based on event type
-                    if (event.eventType === 'Reunião') { // NEW: Populate city for Reuniao
+                    if (event.eventType === 'Reunião') {
                         cityInputReuniao.value = event.city || '';
                     } else if (event.eventType === 'Batismo' || event.eventType === 'Reunião para Mocidade') {
                         ancientsNameInput.value = event.ancientsName || '';
@@ -233,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
         cityInputER.value = '';
         localManagerInput.value = '';
         cityInputEL.value = '';
-        cityInputReuniao.value = ''; // NEW: Clear city input for Reuniao
+        cityInputReuniao.value = '';
 
         // Desmarcar todos os checkboxes de participantes
         participantCheckboxes.forEach(checkbox => {
@@ -270,8 +283,8 @@ document.addEventListener('DOMContentLoaded', () => {
             Array.from(reuniaoTypeCheckboxes)
                 .filter(checkbox => checkbox.checked)
                 .map(checkbox => reuniaoTypes.push(checkbox.value));
-            title = reuniaoTypes.length > 0 ? `Reunião (${reuniaoTypes.join(', ')})` : 'Reunião';
-            city = cityInputReuniao.value.trim(); // NEW: Get city for Reuniao
+            // No need to set title here, it will be generated in PDF export using full names
+            city = cityInputReuniao.value.trim();
         } else if (eventType === 'Batismo' || eventType === 'Reunião para Mocidade') {
             ancientsName = ancientsNameInput.value.trim();
             city = cityInputBM.value.trim();
@@ -295,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const eventData = {
             id: eventId,
             eventType: eventType, // Store event type
-            title: title, // Updated title based on type
+            title: title, // Updated title based on type (can be empty for Reunião to be dynamically generated)
             description: description,
             hour: hour,
             participants: selectedParticipants,
@@ -449,11 +462,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const [y, m, d] = datePart.split('-');
                 const formattedDate = `${d}/${m}/${y}`;
 
+                let eventTypeDisplay = event.eventType; // Default to stored eventType
                 let eventDetails = '';
-                let city = event.city || ''; // Get city for the dedicated column
+                let city = event.city || '';
 
                 if (event.eventType === 'Reunião' && event.reuniaoTypes && event.reuniaoTypes.length > 0) {
-                    eventDetails = ` ${event.reuniaoTypes.join(', ')}`;
+                    // Use the first reunion type's full name for the "Tipo de Evento" column
+                    eventTypeDisplay = reuniaoFullNames[event.reuniaoTypes[0]] || event.reuniaoTypes[0];
+                    // Join all reunion types with their full names for "Detalhes"
+                    const fullNames = event.reuniaoTypes.map(type => reuniaoFullNames[type] || type);
+                    eventDetails = `Tipos: ${fullNames.join(', ')}`;
                 } else if (event.eventType === 'Batismo' || event.eventType === 'Reunião para Mocidade') {
                     eventDetails = `Ancião: ${event.ancientsName || 'N/A'}`;
                 } else if (event.eventType === 'Ensaio Regional') {
@@ -471,8 +489,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 return [
                     formattedDate,
                     event.hour || "—",
-                    event.eventType,
-                    city, // Dedicated city column
+                    eventTypeDisplay, // Now displays full name for Reunião
+                    city,
                     eventDetails,
                     event.description || "Sem descrição",
                     participants
@@ -488,7 +506,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Adjust column widths as needed for landscape
                     0: { cellWidth: 25 }, // Data
                     1: { cellWidth: 20 }, // Horário
-                    2: { cellWidth: 35 }, // Tipo de Evento
+                    2: { cellWidth: 55 }, // Tipo de Evento (increased width for full name)
                     3: { cellWidth: 25 }, // Cidade
                     4: { cellWidth: 45 }, // Detalhes (multiline)
                     5: { cellWidth: 'auto', minCellHeight: 15 }, // Descrição (auto width, min height for multiline)
